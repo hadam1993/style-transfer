@@ -8,6 +8,8 @@ This code is from the notebook @
 https://github.com/udacity/deep-learning-v2-pytorch/blob/master/style-transfer/Style_Transfer_Solution.ipynb
 We are using this code to test style transfer on a
 cloud GPU
+
+Use the method run() to perform style transfer
 """
 
 from PIL import Image
@@ -106,7 +108,12 @@ def gram_matrix(tensor):
     return gram
 
 
-def run(img1,img2):
+def run(content_path,style_path):
+    """
+    Args:
+        content_path: is the path to your content image
+        style_path: is the path to your style image
+    """
     vgg = models.vgg19(pretrained=True).features
     
     # freeze all VGG parameters since we're only optimizing the target image
@@ -119,9 +126,9 @@ def run(img1,img2):
     vgg.to(device)
     
     # load in content and style image
-    content = load_image(img1).to(device)
+    content = load_image(content_path).to(device)
     # Resize style to match content, makes code easier
-    style = load_image(img2, shape=content.shape[-2:]).to(device)
+    style = load_image(style_path, shape=content.shape[-2:]).to(device)
     
     # get content and style features only once before training
     content_features = get_features(content, vgg)
@@ -147,9 +154,6 @@ def run(img1,img2):
     
     content_weight = .5  # alpha
     style_weight = 1e2  # beta
-    
-    # for displaying the target image, intermittently
-    show_every = 400
     
     # iteration hyperparameters
     optimizer = optim.Adam([target], lr=0.003)
